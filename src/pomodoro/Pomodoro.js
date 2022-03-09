@@ -4,70 +4,29 @@ import Session from "./session";
 import StopButton from "./buttons/stopButton";
 import DurationAdjuster from "./durationAdjuster";
 import PlayPause from "./buttons/playButton";
-
-// These functions are defined outside of the component to insure they do not have access to state
-// and are, therefore more likely to be pure.
-
-/**
- * Update the session state with new state after each tick of the interval.
- * @param prevState
- *  the previous session state
- * @returns
- *  new session state with timing information updated.
- */
-function nextTick(prevState) {
-  const timeRemaining = Math.max(0, prevState.timeRemaining - 1);
-  return {
-    ...prevState,
-    timeRemaining,
-  };
-}
-
-/**
- * Higher order function that returns a function to update the session state with the next session type upon timeout.
- * @param focusDuration
- *    the current focus duration
- * @param breakDuration
- *    the current break duration
- * @returns
- *  function to update the session state.
- */
-function nextSession(focusDuration, breakDuration) {
-  /**
-   * State function to transition the current session type to the next session. e.g. On Break -> Focusing or Focusing -> On Break
-   */
-  return (currentSession) => {
-    if (currentSession.label === "Focusing") {
-      return {
-        label: "On Break",
-        timeRemaining: breakDuration * 60,
-      };
-    }
-    return {
-      label: "Focusing",
-      timeRemaining: focusDuration * 60,
-    };
-  };
-}
+import { nextTick, nextSession } from "../utils/timerUtils";
 
 export default function Pomodoro() {
+
   // Timer starts out paused
   const [isTimerRunning, setIsTimerRunning] = useState(false);
+
   // The current session - null where there is no session running
   const [session, setSession] = useState(null);
 
   // Allow the user to adjust the focus and break duration.
   const [focusDuration, setFocusDuration] = useState(25);
   const [breakDuration, setBreakDuration] = useState(5);
-  function IncreaseFocus() {
+
+  function increaseFocus() {
     setFocusDuration(Math.min(focusDuration+5,60))
   }
   
-  function DecreaseFocus() {
+  function decreaseFocus() {
     setFocusDuration(Math.max(focusDuration-5,5))
   }
   
-  function IncreaseBreak() {
+  function increaseBreak() {
     setBreakDuration(Math.min(breakDuration+1,15))
   }
   
@@ -122,8 +81,8 @@ export default function Pomodoro() {
   return (
     <div className="pomodoro">
       <div className="row">
-        <DurationAdjuster label="Focus" duration={focusDuration} increaseTimer={IncreaseFocus} decreaseTimer={DecreaseFocus} session={session} />
-        <DurationAdjuster label="Break" duration={breakDuration} increaseTimer={IncreaseBreak} decreaseTimer={decreaseBreak} session={session} />
+        <DurationAdjuster label="Focus" duration={focusDuration} increaseTimer={increaseFocus} decreaseTimer={decreaseFocus} session={session} />
+        <DurationAdjuster label="Break" duration={breakDuration} increaseTimer={increaseBreak} decreaseTimer={decreaseBreak} session={session} />
       </div>
       <div className="row">
         <div className="col">
@@ -144,7 +103,6 @@ export default function Pomodoro() {
             session?.label === "Focusing" ? focusDuration : breakDuration
           }
         />
-
       </div>
     </div>
   );
