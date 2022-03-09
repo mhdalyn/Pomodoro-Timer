@@ -16,5 +16,5 @@ During an active session, the play button converts to a pause button to temporar
 To install this app locally, follow these steps:
 
  - Download or clone this repository's code
- - In the terminal run: ~~~ npm install ~~~
- - And then: ~~~ npm start ~~~
+ - In the terminal run: ``` npm install ```
+ - And then: ``` npm start ```
