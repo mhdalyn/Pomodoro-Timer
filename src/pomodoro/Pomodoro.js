@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import classNames from "../utils/class-names";
 import useInterval from "../utils/useInterval";
 import Session from "./session";
-import StopButton from "./stopButton";
+import StopButton from "./buttons/stopButton";
 import DurationAdjuster from "./durationAdjuster";
+import PlayPause from "./buttons/playButton";
 
 // These functions are defined outside of the component to insure they do not have access to state
 // and are, therefore more likely to be pure.
@@ -50,10 +50,7 @@ function nextSession(focusDuration, breakDuration) {
   };
 }
 
-
-
-
-function Pomodoro() {
+export default function Pomodoro() {
   // Timer starts out paused
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   // The current session - null where there is no session running
@@ -77,6 +74,7 @@ function Pomodoro() {
   function decreaseBreak() {
     setBreakDuration(Math.max(breakDuration-1,1))
   }
+
   /**
    * Custom hook that invokes the callback function every second
    *
@@ -115,6 +113,7 @@ function Pomodoro() {
       return nextState;
     });
   }
+
   function stopSession() {
     setSession(null);
     setIsTimerRunning(false);
@@ -133,28 +132,12 @@ function Pomodoro() {
             role="group"
             aria-label="Timer controls"
           >
-            <button
-              type="button"
-              className="btn btn-primary"
-              data-testid="play-pause"
-              title="Start or pause timer"
-              onClick={playPause}
-            >
-              <span
-                className={classNames({
-                  oi: true,
-                  "oi-media-play": !isTimerRunning,
-                  "oi-media-pause": isTimerRunning,
-                })}
-              />
-            </button>
-            {/*Implement stopping the current focus or break session. and disable the stop button when there is no active session */}
+            <PlayPause playPause={playPause} isTimerRunning={isTimerRunning} />
             <StopButton session={session} stopSession={stopSession} />
           </div>
         </div>
       </div>
       <div>
-        {/*This area should show only when there is an active focus or break - i.e. the session is running or is paused */}
         <Session
           session={session}
           duration={
@@ -166,5 +149,3 @@ function Pomodoro() {
     </div>
   );
 }
-
-export default Pomodoro;
